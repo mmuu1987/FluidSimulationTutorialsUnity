@@ -13,10 +13,12 @@ public class Manager : MonoBehaviour
     public Material Advection;//对流
     public Material InitDensity;//用于密度
     public Material UpdateVelocity;//使用箭头画出速度
+    public Material UpdateLeftDensity;//更新左侧的密度图
 
     public RenderTexture RtPreFrame;//前一帧图像
     public RenderTexture RtNowFrame;//本帧图像
     public RenderTexture RTVelocity;//速度图
+    public RenderTexture RTDensityLeft;//左侧的密度图，用于更新
     void Start()
     {
         Application.targetFrameRate = 10;
@@ -41,19 +43,25 @@ public class Manager : MonoBehaviour
             }
         }
         Graphics.Blit(null, RtPreFrame, InitDensity);//绘制初始的黑白棋盘格纹理
+        Graphics.Blit(RtPreFrame, RTDensityLeft);
     }
     private void Update()
     {
         Advection.SetTexture("_MainTex", RtPreFrame);
         Advection.SetTexture("_VelocityTex", RTVelocity);
+        Advection.SetTexture("_DensityLeft", RTDensityLeft);
         UpdateVelocity.SetFloatArray("_ArrowRotation", ArrowRotation); 
     }
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
 
         Graphics.Blit(null, RTVelocity, UpdateVelocity);//绘制速度纹理
-        Graphics.Blit(RtPreFrame, RtNowFrame, Advection);//移动之前的纹理
+
+        Graphics.Blit(RTDensityLeft, RtPreFrame);//移动左侧的纹理
+        Graphics.Blit(RtPreFrame, RTDensityLeft, UpdateLeftDensity);
+
         Graphics.Blit(RtNowFrame, RtPreFrame);
+        Graphics.Blit(RtPreFrame, RtNowFrame, Advection);//移动之前的纹理
         Graphics.Blit(source, destination);
     }
 }

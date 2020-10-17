@@ -1,10 +1,8 @@
-﻿Shader "Unlit/Advection"
+﻿Shader "Unlit/UpdateDensityLeft"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _VelocityTex("Texture",2D) = "white"{}
-        _DensityLeft("Texture",2D) = "white"{}
     }
     SubShader
     {
@@ -35,8 +33,6 @@
             };
 
             sampler2D _MainTex;
-            sampler2D _VelocityTex;
-            sampler2D _DensityLeft;
             float4 _MainTex_ST;
 
             v2f vert (appdata v)
@@ -48,15 +44,11 @@
                 return o;
             }
 
-            fixed4 frag(v2f i) : SV_Target
+            fixed4 frag (v2f i) : SV_Target
             {
-                float2 uv = i.uv - 1.0f / 256.0f * tex2D(_VelocityTex, i.uv).xy;
-                float4 col = tex2D(_MainTex, uv);
-                if (uv.x < 0)
-                {
-                    uv.x += 1.0f;
-                    col = tex2D(_DensityLeft, uv);
-                }
+                float uvx = i.uv.x - 1.0f / 256.0f;
+                if (uvx < 0)  uvx += 1.0f;
+                fixed4 col = tex2D(_MainTex, float2(uvx, i.uv.y));
                 return col;
             }
             ENDCG
