@@ -1,9 +1,8 @@
-﻿Shader "Unlit/Advection"
+﻿Shader "Unlit/UpdateVelocity"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _VelocityTex("Texture",2D) = "white"{}
     }
     SubShader
     {
@@ -34,8 +33,8 @@
             };
 
             sampler2D _MainTex;
-            sampler2D _VelocityTex;
             float4 _MainTex_ST;
+            uniform float _ArrowRotation[256];
 
             v2f vert (appdata v)
             {
@@ -46,15 +45,16 @@
                 return o;
             }
 
-            fixed4 frag(v2f i) : SV_Target
+            fixed4 frag (v2f i) : SV_Target
             {
-                float2 uv = i.uv - 1.0f / 256.0f * tex2D(_VelocityTex, i.uv).xy;
-                if (uv.x < 0)
-                {
-                    uv.x += 1.0f;
-                }
-                float4 col = tex2D(_MainTex, uv);
-                return col;
+
+               int _TexelNumber = 16;
+               int intuvx = floor(i.uv.x * _TexelNumber);
+               int intuvy = floor(i.uv.y * _TexelNumber);
+               float rad = _ArrowRotation[intuvy * _TexelNumber + intuvx] * 3.1415927f / 180.0f;
+               float cosRes = cos(rad);
+               float sinRes = sin(rad);
+               return float4(cosRes,sinRes, 0.0f, 1.0f);
             }
             ENDCG
         }

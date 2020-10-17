@@ -471,8 +471,10 @@ MonoBehaviour:
   prefab: {fileID: 2128153429346027801, guid: 79ed005eee6be7a4b80b235ee0b04f59, type: 3}
   Advection: {fileID: 2100000, guid: 55895625d3a74ed44af551748288f1d7, type: 2}
   InitDensity: {fileID: 2100000, guid: b7648d21334b5ae4aa17b378db3116c0, type: 2}
+  UpdateVelocity: {fileID: 2100000, guid: 42b1c0d6013dd5747bbcfce2e8a6b691, type: 2}
   RtPreFrame: {fileID: 8400000, guid: 390969080c5783140bfa43f32db2f8f8, type: 2}
   RtNowFrame: {fileID: 8400000, guid: dea58893c876aec438e79148d7040758, type: 2}
+  RTVelocity: {fileID: 8400000, guid: 4ada4a5dda3b57b45b3055f36bb15051, type: 2}
 --- !u!1001 &5146343828663440974
 PrefabInstance:
   m_ObjectHideFlags: 0
