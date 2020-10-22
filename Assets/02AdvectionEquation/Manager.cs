@@ -35,9 +35,22 @@ public class Manager : MonoBehaviour
                 Arrow[i, j].transform.Rotate(new Vector3(90.0f, 0.0f, 0.0f));
                 Arrow[i, j].transform.Rotate(new Vector3(0.0f, 0.0f, 90.0f));
                 ArrowRotation[j * QuadNumber + i] = 0.0f;
-                if (j != 0 && j < QuadNumber - 1 && i >= 6 && i <= 10)
+                int HalfNumber = QuadNumber / 2;
+                if (i <= HalfNumber + 2 && i >= HalfNumber + 1 && j <= HalfNumber + 2 && j >= HalfNumber + 1)//右上角
+                {
+                    ArrowRotation[j * QuadNumber + i] = 315.0f;
+                }
+                if (i <= HalfNumber && i >= HalfNumber - 1 && j <= HalfNumber + 2 && j >= HalfNumber + 1)//左上角
                 {
                     ArrowRotation[j * QuadNumber + i] = 45.0f;
+                }
+                if (i <= HalfNumber && i >= HalfNumber - 1 && j <= HalfNumber && j >= HalfNumber - 1)//左下角
+                {
+                    ArrowRotation[j * QuadNumber + i] = 135.0f;
+                }
+                if (i <= HalfNumber + 2 && i >= HalfNumber + 1 && j <= HalfNumber && j >= HalfNumber - 1)//右下角
+                {
+                    ArrowRotation[j * QuadNumber + i] = 225.0f;
                 }
                 Arrow[i, j].transform.Rotate(new Vector3(0.0f, 0.0f, ArrowRotation[j * QuadNumber + i]));
             }
