@@ -93,7 +93,6 @@
                          uv = float2(uvxMinus, uvy);
                          float leftT = tex2D(_TimeTexM1, uv).g;
 
-
                          uv = float2(uvx, uvyPlus);
                          float topT = tex2D(_TimeTexM1, uv).g;
 
