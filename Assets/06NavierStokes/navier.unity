@@ -369,7 +369,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 963194225}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f122ebc463e023f48860974a11f03f99, type: 3}
+  m_Script: {fileID: 11500000, guid: 770370762bd19c9498ca3c353ecd1918, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   DyeRT: {fileID: 8400000, guid: b24f23ea22dddaf479932b50c560d700, type: 2}
@@ -383,6 +383,7 @@ MonoBehaviour:
   InitVelocityMat: {fileID: 2100000, guid: 80070064e876afd48bb54ff3b51da071, type: 2}
   AdvectionMat: {fileID: 2100000, guid: a53ad56b950691249a258079b87e95bb, type: 2}
   SplatMat: {fileID: 2100000, guid: 34644c0add533ab409c4bbc9bb44302e, type: 2}
+  ViscosityMat: {fileID: 2100000, guid: 5d0eddb0e2a3fb64995819749c0c4d8f, type: 2}
   DivergenceMat: {fileID: 2100000, guid: 63f32f0b7dbe9f243858770b36d6ed3c, type: 2}
   PressureMat: {fileID: 2100000, guid: 958481df47ba4db4fab7f5bb2526e346, type: 2}
   SubtractMat: {fileID: 2100000, guid: 3ac0ef903d40a8445b68dc638fe80b7d, type: 2}

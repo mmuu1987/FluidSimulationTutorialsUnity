@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Euler : MonoBehaviour
+public class NavierStokes : MonoBehaviour
 {
     public RenderTexture DyeRT;
     public RenderTexture DyeRT2;
@@ -16,6 +16,7 @@ public class Euler : MonoBehaviour
     public Material InitVelocityMat;
     public Material AdvectionMat;
     public Material SplatMat;
+    public Material ViscosityMat;//新
     public Material DivergenceMat;
     public Material PressureMat;
     public Material SubtractMat;
@@ -25,7 +26,7 @@ public class Euler : MonoBehaviour
     int MouseDown = 0;
     void Start()
     {
-        Graphics.Blit(null,DyeRT,InitDyeMat);
+        Graphics.Blit(null, DyeRT, InitDyeMat);
         Graphics.Blit(null, VelocityRT, InitVelocityMat);
         Graphics.Blit(null, PressureRT);
     }
@@ -44,11 +45,11 @@ public class Euler : MonoBehaviour
     {
 
         //第一步：平流速度
-         Graphics.Blit(VelocityRT, VelocityRT2);
+        Graphics.Blit(VelocityRT, VelocityRT2);
         AdvectionMat.SetTexture("_VelocityTex", VelocityRT2);
         Graphics.Blit(VelocityRT2, VelocityRT, AdvectionMat);
-        
-        //第二步：添加鼠标拖动的力，得到中间速度
+
+        //第二步：添加鼠标拖动的力
         SplatMat.SetTexture("_VelocityTex", VelocityRT);
         SplatMat.SetFloat("PointerX", (float)MouseX / Screen.width);
         SplatMat.SetFloat("PointerY", (float)MouseY / Screen.height);
@@ -57,11 +58,19 @@ public class Euler : MonoBehaviour
         SplatMat.SetInt("MouseDown", MouseDown);
         Graphics.Blit(null, VelocityRT2, SplatMat);
 
-        //第三步：根据中间速度算出散度
+        //第三步：计算受到粘性影响的速度，得到中间速度
+        for (int i = 0;i < 10;i++)
+        {
+            ViscosityMat.SetTexture("_VelocityTex", VelocityRT2);
+            Graphics.Blit(VelocityRT2, VelocityRT,ViscosityMat);
+            Graphics.Blit(VelocityRT, VelocityRT2);
+        }
+
+        //第四步：根据中间速度算出散度
         DivergenceMat.SetTexture("_VelocityTex", VelocityRT2);
         Graphics.Blit(VelocityRT2, DivergenceRT, DivergenceMat);
 
-        //第四步：根据散度和中间速度，迭代计算压力
+        //第五步：根据散度和中间速度，迭代计算压力
         PressureMat.SetTexture("_DivergenceTex", DivergenceRT);
         for (int i = 0; i < 20; i++)
         {
@@ -70,12 +79,12 @@ public class Euler : MonoBehaviour
             Graphics.Blit(DivergenceRT, PressureRT, PressureMat);
         }
 
-        //第五步：中间速度减去压力梯度，得无散度的下一时刻速度
+        //第六步：中间速度减去压力梯度，得无散度的下一时刻速度
         SubtractMat.SetTexture("_VelocityTex", VelocityRT2);
         SubtractMat.SetTexture("_PressureTex", PressureRT);
         Graphics.Blit(VelocityRT2, VelocityRT, SubtractMat);
 
-        //第六步：用最终速度平流颜色
+        //第七步：用最终速度平流颜色
         Graphics.Blit(DyeRT, DyeRT2);
         DisplayMat.SetTexture("_DyeTex", DyeRT2);
         DisplayMat.SetTexture("_VelocityTex", VelocityRT);
@@ -84,7 +93,6 @@ public class Euler : MonoBehaviour
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         Prepare();
-        //试一下把DyeRT改成VelocityRT/DivergenceRT/PressureRT会出现什么？
-        Graphics.Blit(DivergenceRT, destination);
+        Graphics.Blit(DyeRT, destination);
     }
 }
