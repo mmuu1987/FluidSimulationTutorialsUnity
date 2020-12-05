@@ -14,9 +14,10 @@ public class ShallowWater : MonoBehaviour
     float[,] h, u, v, U1, U2, U3, F1, F2, F3, G1, G2, G3, f1, f2, f3, g1, g2, g3, u1pred, u2pred, u3pred, z;
     float dx, dy, dt, cfl = 0.8f;
     int scheme = 1;//Lax Frieshs == 1,MacCormack == 2
-    int watercondition = 2;//1代表Dam Break，2代表下雨，3代表有坡度的DamBreak
+    int watercondition = 2;//1代表Dam Break，2代表下雨，3代表有坡度的DamBreak,4代表设置好的反射边界条件
     int Boundary = 1;//1代表不反射，2代表反射
     int[,] drop;//用于下雨的情况
+	float grad = 1.0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,15 +40,15 @@ public class ShallowWater : MonoBehaviour
         }
 
 
-        for (int i = 0; i < nmax; i++)
+        for (int i = 0; i <= nmax; i++)
         {
-            for (int j = 0; j < nmax; j++)
+            for (int j = 0; j <= nmax; j++)
             {
                 z[i, j] = 0;
                 if (watercondition == 3)
                 {
-                    if (i < nmax / 2 && i > nmax * 3 / 8) z[i, j] = z[i - 1, j] + 0.01f;
-                    if (i >= nmax / 2 && i < nmax * 5 / 8) z[i, j] = z[i - 1, j] - 0.01f;
+                    if (i < nmax / 2 && i > nmax * 3 / 8) z[i, j] = z[i - 1, j] + grad;
+                    if (i >= nmax / 2 && i < nmax * 5 / 8) z[i, j] = z[i - 1, j] - grad;
                 }
             }
         }
@@ -60,7 +61,13 @@ public class ShallowWater : MonoBehaviour
                 if (i < nmax / 2) h[i, j] = 2.0f;
                 else h[i, j] = 1.0f;
                 if (watercondition == 2) h[i, j] = 2.0f;//仅下雨，而无Dam Break
-                verts[j * nmax + i] = new Vector3((float)i / (float)nmax * 10.0f - 5.0f, h[i, j] + z[i,j], (float)j / (float)nmax * 10.0f - 5.0f);
+				if(watercondition == 4)
+				{
+					if (i < nmax / 2 && j < nmax / 2) h[i, j] = 2.0f;
+                    else h[i, j] = 1.0f;
+					Boundary = 2;
+				}
+                verts[j * nmax + i] = new Vector3((float)i / (float)nmax * 10.0f - 5.0f, h[i, j], (float)j / (float)nmax * 10.0f - 5.0f);
                 u[i, j] = v[i, j] = 0.0f;
                 U1[i, j] = h[i, j];
                 U2[i, j] = h[i, j] * u[i, j];
@@ -234,19 +241,21 @@ public class ShallowWater : MonoBehaviour
                         drop[i, j]--;
                     }
                 }
-                h[i, j] = U1[i, j];
+				if(watercondition == 3)//保证源头一直有水流出
+				{
+					if(i == 0)U1[i,j] = 2.0f;
+				}
+				h[i, j] = U1[i, j];
                 u[i, j] = U2[i, j] / U1[i, j];
                 v[i, j] = U3[i, j] / U1[i, j];
-
             }
         }
-
         BoundaryCondition();
         for (int i = 0; i < nmax; i++)
         {
             for (int j = 0; j < nmax; j++)
             {
-                verts[j * nmax + i] = new Vector3((float)i / (float)nmax * 10.0f - 5.0f, h[i, j] + z[i, j], (float)j / (float)nmax * 10.0f - 5.0f);
+                verts[j * nmax + i] = new Vector3((float)i / (float)nmax * 10.0f - 5.0f, h[i, j], (float)j / (float)nmax * 10.0f - 5.0f);
                 F1[i, j] = h[i, j] * u[i, j];
                 F2[i, j] = h[i, j] * u[i, j] * u[i, j] + 0.5f * 10.0f * h[i, j] * h[i, j];
                 F3[i, j] = h[i, j] * u[i, j] * v[i, j];
@@ -331,6 +340,10 @@ public class ShallowWater : MonoBehaviour
                         drop[i, j]--;
                     }
                 }
+				if(watercondition == 3)//保证源头一直有水流出
+				{
+					if(i == 0)U1[i,j] = 2.0f;
+				}
                 h[i, j] = U1[i, j];
                 u[i, j] = U2[i, j] / U1[i, j];
                 v[i, j] = U3[i, j] / U1[i, j];
@@ -341,7 +354,7 @@ public class ShallowWater : MonoBehaviour
         {
             for (int j = 0; j < nmax; j++)
             {
-                verts[j * nmax + i] = new Vector3((float)i / (float)nmax * 10.0f - 5.0f, h[i, j] + z[i,j], (float)j / (float)nmax * 10.0f - 5.0f);
+                verts[j * nmax + i] = new Vector3((float)i / (float)nmax * 10.0f - 5.0f, h[i, j], (float)j / (float)nmax * 10.0f - 5.0f);
                 F1[i, j] = h[i, j] * u[i, j];
                 F2[i, j] = h[i, j] * u[i, j] * u[i, j] + 0.5f * 10.0f * h[i, j] * h[i, j];
                 F3[i, j] = h[i, j] * u[i, j] * v[i, j];
