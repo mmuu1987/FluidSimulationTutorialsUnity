@@ -16,7 +16,7 @@ public class FullScreen : MonoBehaviour
     private void Start()
     {
         Graphics.Blit(_rtNull, _rt0);
-        Application.targetFrameRate = 2;
+        Application.targetFrameRate = 60;
        
     }
     private void Update()
